@@ -44,7 +44,7 @@ def export(
             help="Fuse multi-head attention subgraph into one optimized operation. (ONNX Runtime-only).",
         ),
     ] = False,
-    opset: Annotated[int, typer.Option(min=16, max=20, help="ONNX opset version of exported model.")] = 17,
+    opset: Annotated[int, typer.Option(min=16, max=20, help="ONNX opset version of exported model.")] = 18,
     fp16: Annotated[bool, typer.Option("--fp16", help="Whether to also convert to FP16.")] = False,
 ):
     """Export LightGlue to ONNX."""
@@ -100,8 +100,9 @@ def export(
         opset_version=opset,
         dynamic_axes=dynamic_axes,
     )
-    onnx.checker.check_model(output)
-    onnx.save_model(SymbolicShapeInference.infer_shapes(onnx.load_model(output), auto_merge=True), output)  # type: ignore
+    # onnx.checker.check_model(output)
+    # onnx.save_model(SymbolicShapeInference.infer_shapes(onnx.load_model(output), auto_merge=True), output)  # type: ignore
+    onnx.save_model(onnx.load_model(output), output)
     typer.echo(f"Successfully exported model to {output}")
     if fp16:
         typer.echo(

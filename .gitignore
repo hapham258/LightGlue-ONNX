@@ -2,6 +2,7 @@
 *.pth
 *.pt2
 *.onnx
+*.onnx.data
 *.engine
 *.profile
 *.timing

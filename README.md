@@ -1,3 +1,16 @@
+Note for setup:
+```
+conda create -n lightglue_all python=3.11
+conda activate lightglue_all
+conda install -c conda-forge poetry
+poetry install
+pip install torch torchvision kornia
+pip install -U onnxscript
+conda install -c nvidia cudnn=9
+export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
+```
+Then run `demo_torch.ipynb` and `demo_onnx.ipynb`.
+
 <div align="right"> English | <a href="https://github.com/fabio-sim/LightGlue-ONNX/blob/main/docs/README.zh.md">简体中文</a> | <a href="https://github.com/fabio-sim/LightGlue-ONNX/blob/main/docs/README.ja.md">日本語</a></div>
 
 [![ONNX](https://img.shields.io/badge/ONNX-grey)](https://onnx.ai/)
@@ -112,6 +125,35 @@ python dynamo.py infer \
   -h 512 -w 512 \
   -d openvino
 </pre>
+</details>
+
+## Benchmark
+
+<p align="center">
+  <a><img src="assets/benchmark.png" alt="Logo" width=80%></a>
+  <br>
+  <em>Benchmark results on GPU (RTX 3080). With compilation and adaptivity, LightGlue runs at 150 FPS @ 1024 keypoints and 50 FPS @ 4096 keypoints per image. This is a 4-10x speedup over SuperGlue. </em>
+</p>
+
+<p align="center">
+  <a><img src="assets/benchmark_cpu.png" alt="Logo" width=80%></a>
+  <br>
+  <em>Benchmark results on CPU (Intel i7 10700K). LightGlue runs at 20 FPS @ 512 keypoints. </em>
+</p>
+
+Obtain the same plots for your setup using our [benchmark script](benchmark.py):
+```
+python benchmark.py [--device cuda] [--add_superglue] [--num_keypoints 512 1024 2048 4096] [--compile]
+```
+
+<details>
+<summary>[Performance tip - click to expand]</summary>
+
+Note: **Point pruning** introduces an overhead that sometimes outweighs its benefits.
+Point pruning is thus enabled only when the there are more than N keypoints in an image, where N is hardware-dependent.
+We provide defaults optimized for current hardware (RTX 30xx GPUs).
+We suggest running the benchmark script and adjusting the thresholds for your hardware by updating `LightGlue.pruning_keypoint_thresholds['cuda']`.
+
 </details>
 
 ## Credits

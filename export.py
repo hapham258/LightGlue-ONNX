@@ -142,7 +142,7 @@ def export_onnx(
                 "matches0",
                 "mscores0",
             ],
-            opset_version=17,
+            opset_version=18,
             dynamic_axes=dynamic_axes,
         )
     else:
@@ -168,7 +168,7 @@ def export_onnx(
             extractor_path,
             input_names=["image"],
             output_names=["keypoints", "scores", "descriptors"],
-            opset_version=17,
+            opset_version=18,
             dynamic_axes=dynamic_axes,
         )
 
@@ -186,7 +186,7 @@ def export_onnx(
             lightglue_path,
             input_names=["kpts0", "kpts1", "desc0", "desc1"],
             output_names=["matches0", "mscores0"],
-            opset_version=17,
+            opset_version=18,
             dynamic_axes={
                 "kpts0": {1: "num_keypoints0"},
                 "kpts1": {1: "num_keypoints1"},
