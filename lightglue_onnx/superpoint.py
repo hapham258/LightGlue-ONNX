@@ -68,6 +68,24 @@ def simple_nms(scores, nms_radius: int):
         max_mask = max_mask | (new_max_mask & (~supp_mask))
     return torch.where(max_mask, scores, zeros)[0]
 
+def remove_borders(scores, pad: int):
+    if pad <= 0:
+        return scores
+
+    _, h, w = scores.shape
+    device = scores.device
+
+    ys = torch.arange(h, device=device).view(1, h, 1)
+    xs = torch.arange(w, device=device).view(1, 1, w)
+
+    keep_y = (ys >= pad) & (ys < h - pad)
+    keep_x = (xs >= pad) & (xs < w - pad)
+
+    mask = keep_y & keep_x
+    mask = mask.to(scores.dtype)
+
+    return scores * mask
+
 
 @torch.jit.script_if_tracing
 def top_k_keypoints(
@@ -179,11 +197,7 @@ class SuperPoint(nn.Module):
         # scores.shape == (B, H, W)
 
         # Discard keypoints near the image borders
-        if pad := self.conf["remove_borders"]:
-            scores[:, :pad] = -1
-            scores[:, :, :pad] = -1
-            scores[:, -pad:] = -1
-            scores[:, :, -pad:] = -1
+        scores = remove_borders(scores, self.conf["remove_borders"])
 
         # Below this, B > 1 is not supported as each image can have a different number of keypoints.
 
