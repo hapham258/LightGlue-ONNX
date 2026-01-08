@@ -96,7 +96,7 @@ def infer(
             (
                 "TensorrtExecutionProvider",
                 {
-                    "trt_fp16_enable": True,
+                    "trt_fp16_enable": False,
                     "trt_engine_cache_enable": True,
                     "trt_engine_cache_path": "weights/cache",
                 },
