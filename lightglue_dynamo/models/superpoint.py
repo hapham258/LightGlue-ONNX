@@ -65,6 +65,24 @@ def simple_nms(scores: torch.Tensor, nms_radius: int) -> torch.Tensor:
         max_mask = max_mask | (new_max_mask & (~supp_mask))
     return torch.where(max_mask, scores, zeros)[:, 0]
 
+def remove_borders(scores, pad: int):
+    if pad <= 0:
+        return scores
+
+    _, h, w = scores.shape
+    device = scores.device
+
+    ys = torch.arange(h, device=device).view(1, h, 1)
+    xs = torch.arange(w, device=device).view(1, 1, w)
+
+    keep_y = (ys >= pad) & (ys < h - pad)
+    keep_x = (xs >= pad) & (xs < w - pad)
+
+    mask = keep_y & keep_x
+    mask = mask.to(scores.dtype)
+
+    return scores * mask
+
 
 class SuperPoint(nn.Module):
     """SuperPoint Convolutional Detector and Descriptor
@@ -149,11 +167,8 @@ class SuperPoint(nn.Module):
         scores = simple_nms(scores, self.nms_radius)  # (B, H, W)
 
         # Discard keypoints near the image borders
-        if pad := self.remove_borders:
-            scores[:, :pad] = -1
-            scores[:, -pad:] = -1
-            scores[:, :, :pad] = -1
-            scores[:, :, -pad:] = -1
+        scores = remove_borders(scores, self.remove_borders)
+
 
         # Select top-K keypoints
         top_scores, top_indices = scores.reshape(b, h * s * w * s).topk(self.num_keypoints)

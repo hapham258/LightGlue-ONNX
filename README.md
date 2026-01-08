@@ -11,6 +11,14 @@ export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
 ```
 Then run `demo_torch.ipynb` and `demo_onnx.ipynb`.
 
+To infer with TensorRT 10.8, after system-wide installation through debian packages, install additional Python wheels inside the conda environment:
+```
+pip install external/tensorrt-10.8.0.43-cp311-none-linux_x86_64.whl
+pip install external/tensorrt_dispatch-10.8.0.43-cp311-none-linux_x86_64.whl
+pip install external/tensorrt_lean-10.8.0.43-cp311-none-linux_x86_64.whl
+```
+Then try some commands in [Example Commands](#example-commands).
+
 <div align="right"> English | <a href="https://github.com/fabio-sim/LightGlue-ONNX/blob/main/docs/README.zh.md">简体中文</a> | <a href="https://github.com/fabio-sim/LightGlue-ONNX/blob/main/docs/README.ja.md">日本語</a></div>
 
 [![ONNX](https://img.shields.io/badge/ONNX-grey)](https://onnx.ai/)
@@ -67,7 +75,7 @@ LightGlue Dynamo CLI
 
 Pass `--help` to see the available options for each command. The CLI will export the full extractor-matcher pipeline so that you don't have to worry about orchestrating intermediate steps.
 
-## 📖 Example Commands
+## Example Commands
 
 <details>
 <summary>🔥 ONNX Export</summary>
@@ -95,11 +103,11 @@ python dynamo.py infer \
 <summary>🚀 ONNX Runtime Inference (TensorRT)</summary>
 <pre>
 python dynamo.py infer \
-  weights/superpoint_lightglue_pipeline.trt.onnx \
+  weights/superpoint_lightglue_pipeline.onnx \
   assets/sacre_coeur1.jpg assets/sacre_coeur2.jpg \
   superpoint \
   -h 1024 -w 1024 \
-  -d tensorrt --fp16
+  -d tensorrt
 </pre>
 </details>
 
@@ -107,11 +115,10 @@ python dynamo.py infer \
 <summary>🧩 TensorRT Inference</summary>
 <pre>
 python dynamo.py trtexec \
-  weights/superpoint_lightglue_pipeline.trt.onnx \
+  weights/superpoint_lightglue_pipeline.onnx \
   assets/sacre_coeur1.jpg assets/sacre_coeur2.jpg \
   superpoint \
-  -h 1024 -w 1024 \
-  --fp16
+  -h 1024 -w 1024
 </pre>
 </details>
 
